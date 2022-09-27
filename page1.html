@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</head>
+
+  <body>
+    <div class="jumbotron text-center">
+      <h1>Posts data</h1>
+    </div>
+    <div class="container">
+    
+<!-- Content starts there -->
+      <table  class="table table-striped">
+        <thead id ="th1"> </th>
+        <thead id = "th2"></th>
+        <tbody id= "board1"></tbody>
+        <tbody id= "board2"></tbody>
+      </table>
+      
+    </div>   
+      
+  <!-- Showing Modal -->
+  <div class="modal fade" id="newRecords" method="post" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">New posts records</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form  id="postData">
+          <div class="modal-body" >
+
+          <div class="form-group " >
+              <label>Id: </label> 
+              <input id="id" class="form-control col-md-8"" type="number" name="id"  value="">
+          </div>
+          <div class="form-group " >
+              <label>UserId: </label> 
+              <input id="userId" class="form-control col-md-8"" type="number" name="userId"  value="">
+          </div>
+          <div class="form-group " >
+              <label>Title: </label> 
+              <input id="title" class="form-control col-md-8"" type="text" name="title"  value="">
+          </div>
+          <div class="form-group " >
+              <label class="uper">Body: </label> 
+              <textarea  id="body"  class="form-control col-md-8" cols="20" rows="5" type="text" name="body"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" id="close" class="btn btn-primary" >Sent post</button>
+          </div>
+        </form>
+      </div>
+      </div>
+    </div>
+  </div> 
+
+<script>
+// fuction "Go back" on details page
+function goBack() {
+window.history.back();
+  };
+
+//add eventlistener
+document.getElementById('postData').addEventListener('submit', postData);
+
+ function postData(event){
+    event.preventDefault();
+
+  var newData = {
+          'userId': document.querySelector('#userId').value,
+          'id': document.querySelector('#id').value,
+          'title': document.querySelector('#title').value,
+          'body': document.querySelector('#body').value
+      };
+        
+var myJSON = JSON.stringify(newData);
+
+//Sent post method
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body : myJSON
+    }).then(res => {
+    console.log("Request complete!:" + myJSON);
+      }).catch(function(res){ console.log(res) });
+      $('#newRecords').modal('toggle'); 
+
+     
+}
+
+        
+ //Take GET element
+var getElement=window.location.search.substring(1);
+
+//take post or post with element
+fetch('https://jsonplaceholder.typicode.com/posts/'+getElement).
+then((resp) => resp.json()).
+then(data=>{
+
+    //if its Object, making data array. 
+    if (Array.isArray(data)) {
+        adata=data
+        var board1 = '';
+        var th1 =
+        '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newRecords">Create new record </button>'+
+        '<h1> List Page </h1>'+
+          '<tr>'+
+            '<th>ID </th>'+
+            '<th>Title</th>'+
+          '</tr>';
+
+          adata.forEach(element => {
+          board1 +=
+          '<tr >' +
+            '<td><a  href="?'+element.id+'">' + element.id + '</a></td>' +
+            '<td><a  href="?' + element.id + '">' + element.title + '</a></td>' +
+          '</tr>';
+          });
+        
+        document.getElementById("th1").innerHTML = th1; 
+        document.getElementById("board1").innerHTML = board1; 
+
+        } else {
+           // if its array, showing results 
+          
+            var board2 = '';
+            var th2 = 
+          '<h1> Details </h1>'+
+            '<tr>'+
+              '<th> UserId</th>'+
+              '<th> Title</th>'+
+              '<th> Body </th>'+
+            '</tr>'; 
+            board2 =
+            '<tr >' +
+              '<td>' +  data.userId + '</td>'+
+              '<td>' +  data.title + '</td>'+
+              '<td>' +  data.body + '</td>'+
+            '</tr>'+
+            '<button  type="button" class="btn btn-primary" onclick="goBack()">Go Back</button>';
+
+          document.getElementById("th2").innerHTML = th2; 
+          document.getElementById("board2").innerHTML = board2; 
+        };
+
+});
+</script>
+
+  </body>
+</html>
